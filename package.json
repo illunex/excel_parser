@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "fxjs": "^0.16.3",
+    "mariadb": "^2.4.2",
     "xlsx": "^0.16.7"
   }
 }
