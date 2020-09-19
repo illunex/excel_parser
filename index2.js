@@ -2,14 +2,14 @@ const XLSX = require("xlsx");
 const mariadb = require("mariadb");
 const {go, range, forEach, map} = require("fxjs/Strict");
 
-let workbook = XLSX.readFile(__dirname + "/gvc(19).xlsx")
+let workbook = XLSX.readFile(__dirname + "/gvc(29).xlsx")
 let worksheet = workbook.Sheets["Sheet1"]
 
 let standardCompanyData = new Map();
 let link = new Array();
 // 기준기업정보
 go(
-    range(2, 20002),
+    range(2, 1704), //20002, 561704
     forEach(i => {
         if (worksheet[`D${i}`] !== undefined && worksheet[`C${i}`] !== "") {  // 기준
             standardCompanyData.set(
@@ -249,67 +249,53 @@ mariadb.createConnection({host: "13.209.83.88", user: "jin", password: "park2213
         let i = 0;
         go(standardCompanyData.values(),
             forEach(item => {
-                conn.query("select * from whasung.node where kedcd = "+item.kedcd)
+                conn.query("insert into whasung.node values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [item.kedcd,
+                        item.companyName,
+                        item.kind,
+                        item.industryCode,
+                        item.industryName,
+                        item.corporationNum,
+                        item.businessNum,
+                        item.sales_2019,
+                        item.scale,
+                        item.publicOffering,
+                        item.establishment,
+                        item.product,
+                        item.state,
+                        item.addrSiDo,
+                        item.addrGuGun,
+                        item.addrDong
+                    ])
                     .then(res => {
-                        if (res.length !== 0) {
-                            let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
-                            process.stdout.cursorTo(0);
-                            process.stdout.clearLine(1);
-                            process.stdout.write(per + '%');
-                        } else {
-                            conn.query("insert into whasung.node values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                                [item.kedcd,
-                                    item.companyName,
-                                    item.kind,
-                                    item.industryCode,
-                                    item.industryName,
-                                    item.corporationNum,
-                                    item.businessNum,
-                                    item.sales_2019,
-                                    item.scale,
-                                    item.publicOffering,
-                                    item.establishment,
-                                    item.product,
-                                    item.state,
-                                    item.addrSiDo,
-                                    item.addrGuGun,
-                                    item.addrDong
-                                ])
-                                .then(res => {
-                                    let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
-                                    process.stdout.cursorTo(0);
-                                    process.stdout.clearLine(1);
-                                    process.stdout.write(per + '%');
-                                })
-                                .catch(err => {console.log(err)})
-                        }
+                        let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
+                        process.stdout.cursorTo(0);
+                        process.stdout.clearLine(1);
+                        process.stdout.write(per + '%');
                     })
+                    .catch(err => {let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
+                        process.stdout.cursorTo(0);
+                        process.stdout.clearLine(1);
+                        process.stdout.write(per + '%');})
             })
         );
         go(link,
             forEach(item => {
-                conn.query(`select * from whasung.link where standardKedcd = ${item.standardKedcd} and targetkedcd = ${item.targetKedcd} and relation = '${item.relation}'`)
+                conn.query("insert into whasung.link values (?,?,?,?)",
+                    [item.standardKedcd,
+                        item.targetKedcd,
+                        item.relation,
+                        item.transactionAmount])
                     .then(res => {
-                        if (res.length !== 0) {
-                            let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
-                            process.stdout.cursorTo(0);
-                            process.stdout.clearLine(1);
-                            process.stdout.write(per + '%');
-                        } else {
-                            conn.query("insert into whasung.link values (?,?,?,?)",
-                                [item.standardKedcd,
-                                    item.targetKedcd,
-                                    item.relation,
-                                    item.transactionAmount])
-                                .then(res => {
-                                    let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
-                                    process.stdout.cursorTo(0);
-                                    process.stdout.clearLine(1);
-                                    process.stdout.write(per + '%');
-                                })
-                                .catch(err => {console.log(err)});
-                        }
+                        let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
+                        process.stdout.cursorTo(0);
+                        process.stdout.clearLine(1);
+                        process.stdout.write(per + '%');
                     })
+                    .catch(err => {let per = (++i / ((standardCompanyData.size + link.length) / 100)).toFixed(2);
+                        process.stdout.cursorTo(0);
+                        process.stdout.clearLine(1);
+                        process.stdout.write(per + '%');});
             })
         );
     })
