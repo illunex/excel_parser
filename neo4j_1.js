@@ -14,7 +14,7 @@ mariadb.createConnection({host: "13.209.83.88", user: "jin", password: "park2213
                     // process.stdout.clearLine(1);
                     // process.stdout.write(i / (res / 100) + '%');
                 }
-                console.log("끝")
+                //console.log("끝")
                 //await driver.close()
             })
             .catch(err => {console.log(err)})

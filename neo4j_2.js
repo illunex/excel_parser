@@ -5,7 +5,7 @@ const driver = neo4j.driver("neo4j://13.124.117.117:7687", neo4j.auth.basic("neo
 
 mariadb.createConnection({host: "13.209.83.88", user: "jin", password: "park2213", connectionLimit: 5})
     .then(conn => {
-        conn.query("select * from whasung.link where standardKedcd in (select kedcd from whasung.nodeTemp) and targetkedcd in (select kedcd from whasung.nodeTemp) and relation = 'sell'")
+        conn.query("select * from whasung.link where standardKedcd in (select kedcd from whasung.nodeTemp) and targetkedcd in (select kedcd from whasung.nodeTemp) and relation = 'buy'")
             .then(res => {
                 let i = 0;
 
@@ -26,8 +26,8 @@ async function insertData(res) {
     try {
         await session.run(
             'match(n:Company) where n.kedcd = $standardKedcd' +
-            ' match(j:Company) where n.kedcd = $targetkedcd' +
-            ' create (n)-[:sell {transactionAmount: $transactionAmount}]->(j)',
+            ' match(j:Company) where j.kedcd = $targetkedcd' +
+            ' create (n)-[:buy {transactionAmount: $transactionAmount}]->(j)',
             {
                 standardKedcd: res.standardKedcd,
                 targetkedcd: res.targetkedcd,
@@ -41,17 +41,17 @@ async function insertData(res) {
     // on application exit:
 
 }
-// match(n:Company) where n.kedcd = "0000091399"
-// match(j:Company) where j.kedcd = "0000000044"
-// create (n)-[:buy {transactionAmount: 111}]->(j)
-// return n, j
+// // match(n:Company) where n.kedcd = "0000091399"
+// // match(j:Company) where j.kedcd = "0000000044"
+// // create (n)-[:buy {transactionAmount: 111}]->(j)
+// // return n, j
 
-// match(:Company {companyName: "삼성전자"})-[:buy]->(whom:Company)
-// return whom
+// // match(:Company {companyName: "삼성전자"})-[:buy]->(whom:Company)
+// // return whom
 
-match(n:Company)-[b:buy]->(whom:Company) return n, b, whom Limit 200
-//match(:Company {companyName: "삼성전자"})-[:buy]->(whom) return whom
-//match(:Company {companyName: "삼성전자"})-[:buy]->(whom) return whom
+// match(n:Company)-[b:buy]->(whom:Company) return n, b, whom Limit 200
+// //match(:Company {companyName: "삼성전자"})-[:buy]->(whom) return whom
+// //match(:Company {companyName: "삼성전자"})-[:buy]->(whom) return whom
 
-MATCH (n:Company {company: "삼성전자"})
-MATCH p=(n)-[]->() RETURN p LIMIT 100
+// MATCH (n:Company {company: "삼성전자"})
+// MATCH p=(n)-[]->() RETURN p LIMIT 100
